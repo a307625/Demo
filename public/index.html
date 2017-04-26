@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/3.8.0/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/3.8.0/firebase-auth.js"></script>
+    <script defer src="/__/firebase/3.8.0/firebase-database.js"></script>
+    <script defer src="/__/firebase/3.8.0/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/3.8.0/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    <h2>註冊</h2>
+    <lable for="account"></lable>
+    <input id="account" type="text" placeholder="帳號">
+    <lable for="pwd"></lable>
+    <input id="pwd" type="password" placeholder="密碼">
+    <button type="submit" id="registerSmtBtn">Signup</button>
+
+    <h2>登入</h2>
+    <lable for="accountL"></lable>
+    <input id="accountL" type="text" placeholder="帳號">
+    <lable for="pwdL"></lable>
+    <input id="pwdL" type="password" placeholder="密碼">
+    <button type="submit" id="loginSmtBtn">Login</button>
+
+    <h2>登出</h2>
+    <button id="signoutSmtBtn">Signout</button>
+
+    <h2>電子郵件驗證</h2>
+    <button id="verifyBtn">Verify</button>
+
+    <h2>更改密碼</h2>
+    <label for="chgPwd">Email</label>
+    <input id="chgPwd" type="text">
+    <button id="chgPwdBtn">ChangePwd</button>
+
+  </body>
+
+  <script src="https://www.gstatic.com/firebasejs/3.8.0/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyBW3hyyIllKMLTFzel32B2ebyvFi8r7DTE",
+      authDomain: "fir-ece58.firebaseapp.com",
+      databaseURL: "https://fir-ece58.firebaseio.com",
+      projectId: "fir-ece58",
+      storageBucket: "fir-ece58.appspot.com",
+      messagingSenderId: "62175377859"
+    };
+    firebase.initializeApp(config);
+  </script>
+
+
+  <script>
+    var account = document.getElementById("account");
+    var pwd = document.getElementById("pwd");
+    var registerSmtBtn = document.getElementById("registerSmtBtn");
+    registerSmtBtn.addEventListener("click", function(){
+      console.log(account.value);
+      firebase.auth().createUserWithEmailAndPassword(account.value, pwd.value)
+      .then(function(user){
+        console.log("><");
+        user.sendEmailVerification().then(function() {
+          console.log("驗證信寄出");
+          alert("驗證信寄出")
+        }, function(error) {
+          console.error("驗證信錯誤");
+          alert("驗證信錯誤")
+        });
+      })
+      .catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMsg = error.message;
+      console.log(errorMsg);
+      alert(errorMsg)
+    });
+    },false);
+
+    //登入
+    var accountL = document.getElementById("accountL");
+    var pwdL = document.getElementById("pwdL");
+    var loginSmtBtn = document.getElementById("loginSmtBtn");
+    loginSmtBtn.addEventListener("click",function(){
+      firebase.auth().signInWithEmailAndPassword(accountL.value, pwdL.value)
+      .then(function(user){
+        if (user.emailVerified) {
+          alert("Log in success")
+        }else {
+          alert("Email is not verified")
+        }
+      })
+      .catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorMessage);
+        alert(errorMessage)
+      })
+    },false);
+
+    //登出
+    var signoutSmtBtn = document.getElementById("signoutSmtBtn");
+    signoutSmtBtn.addEventListener("click",function(){
+    firebase.auth().signOut().then(function() {
+      console.log("User sign out!");
+    }, function(error) {
+      console.log("User sign out error!");
+    })
+    },false);
+
+    //Email驗證
+
+    var verifyBtn = document.getElementById("verifyBtn");
+    verifyBtn.addEventListener("click",function(){
+      var user = firebase.auth().currentUser;
+      user.sendEmailVerification().then(function() {
+      console.log("驗證信寄出");
+      alert("驗證信寄出")
+    }, function(error) {
+      console.error("驗證信錯誤");
+      alert("驗證信錯誤")
+    });
+    },false);
+
+    //更改密碼
+    var chgPwd = document.getElementById("chgPwd");
+    var chgPwdBtn = document.getElementById("chgPwdBtn");
+    chgPwdBtn.addEventListener("click",function(){
+    firebase.auth().sendPasswordResetEmail(chgPwd.value).then(function() {
+      // Email sent.
+      console.log("更改密碼Email已發送");
+      alert("更改密碼Email已發送")
+      chgPwd.value = "";
+    }, function(error) {
+      // An error happened.
+      console.error("更改密碼",error);
+      alert(error)
+    });
+    },false);
+
+    //查看目前登入狀況
+    var user;
+    firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      user = user;
+      if (user.emailVerified) {
+        user = user;
+        console.log("User is verified and logined", user)
+        alert("User is verified and logined", user)
+      } else {
+        user = null;
+        console.log("Email is not verified")
+        alert("Email is not verified")
+      }
+
+    } else {
+      user = null;
+      console.log("User is not logined yet.");
+    }
+    });
+
+
+  </script>
+</html>
